@@ -175,33 +175,45 @@ function shuffleArray(arr){
 function renderQuestion(index){
   quizDiv.innerHTML="";
   const q = questions[index];
-  progressEl.textContent=`Question ${index+1}/${questions.length}`;
+  progressEl.textContent = `Question ${index+1}/${questions.length}`;
 
-  const card=document.createElement("div");
-  card.className="card";
-  card.innerHTML=`<div class="question">${q.question}</div>
-                  <input type="text" class="answer" id="ansInput" autocomplete="off" autofocus>
-                  <button id="submitBtn">Submit</button>`;
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <div class="question">${q.question}</div>
+    <input type="text" class="answer" id="ansInput" autocomplete="off" autofocus>
+    <button id="submitBtn">Submit</button>
+  `;
   quizDiv.appendChild(card);
 
-  function submit(){
+  // --- Actual answer processing ---
+  function processAnswer(){
     const ans = document.getElementById("ansInput").value.trim() || "-";
-    // Confirmation
-    if(!confirm(`Are you sure you want to submit "${ans}" as your final answer?`)){
-      return; // cancel move
-    }
-    userAnswers[index]=ans;
+    userAnswers[index] = ans;
     if(ans.toLowerCase() === q.answer.toLowerCase()) score++;
     current++;
-    if(current<questions.length){ renderQuestion(current); }
-    else { finishExam(); }
+    if(current < questions.length){ 
+      renderQuestion(current); 
+    } else { 
+      finishExam(); 
+    }
+  }
+
+  // --- Submit with confirmation modal ---
+  function submit(){
+    const ans = document.getElementById("ansInput").value.trim() || "-";
+    showConfirmModal(ans, processAnswer);
   }
 
   document.getElementById("submitBtn").addEventListener("click", submit);
   document.getElementById("ansInput").addEventListener("keydown", e=>{
-    if(e.key==="Enter"){ e.preventDefault(); submit(); }
+    if(e.key === "Enter"){ 
+      e.preventDefault(); 
+      submit(); 
+    }
   });
 }
+
 
 
 function finishExam(){
