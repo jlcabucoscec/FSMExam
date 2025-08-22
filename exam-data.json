@@ -1,0 +1,84 @@
+{
+  "questions": [
+    {
+      "question": "Which principle avoids making systems overly complicated with extra parts?",
+      "answer": "SIMPLICITY"
+    },
+    {
+      "question": "Which UML diagram represents system behavior with actions and flows?",
+      "answer": "ACTIVITY"
+    },
+    {
+      "question": "Which pattern improves testability by separating concerns?",
+      "answer": "MVC"
+    },
+    {
+      "question": "Which UML diagram best illustrates the flow of messages over time?",
+      "answer": "SEQUENCE"
+    },
+    {
+      "question": "In a UML Activity Diagram, which symbol is represented by a diamond?",
+      "answer": "DECISION"
+    },
+    {
+      "question": "Which architectural style is often used in enterprise systems?",
+      "answer": "LAYERED"
+    },
+    {
+      "question": "Which design principle refers to minimizing dependencies between modules?",
+      "answer": "COUPLING"
+    },
+    {
+      "question": "Which layer in Layered Architecture is responsible for database interactions?",
+      "answer": "DATA"
+    },
+    {
+      "question": "Which pattern defines a one-to-many dependency between objects?",
+      "answer": "OBSERVER"
+    },
+    {
+      "question": "Which UML relationship shows a 'has-a' association but independent existence?",
+      "answer": "AGGREGATION"
+    },
+    {
+      "question": "Which principle emphasizes dividing systems into independent units?",
+      "answer": "MODULARITY"
+    },
+    {
+      "question": "Which design pattern is used to create objects without specifying exact classes?",
+      "answer": "FACTORY"
+    },
+    {
+      "question": "Which UML diagram shows class relationships and structure?",
+      "answer": "CLASS"
+    },
+    {
+      "question": "Which principle refers to the degree to which module elements work together?",
+      "answer": "COHESION"
+    },
+    {
+      "question": "Which software architecture style emphasizes small, independent services?",
+      "answer": "MICROSERVICES"
+    },
+    {
+      "question": "Which pattern ensures only one instance of a class exists?",
+      "answer": "SINGLETON"
+    },
+    {
+      "question": "In MVC, which component manages the data and business logic?",
+      "answer": "MODEL"
+    },
+    {
+      "question": "What is the goal of design patterns: reusable ______?",
+      "answer": "SOLUTIONS"
+    },
+    {
+      "question": "Which pattern often works with MVC for creating and managing objects?",
+      "answer": "FACTORY"
+    },
+    {
+      "question": "In UML, which relationship represents an 'is-a' type?",
+      "answer": "INHERITANCE"
+    }
+  ]
+}
