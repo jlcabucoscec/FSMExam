@@ -103,11 +103,25 @@ function inFullscreen(){
 
 /* ------------------ Modal ------------------ */
 const backdrop = document.getElementById("warningBackdrop");
-const continueBtn = document.getElementById("continueBtn");
-const exitBtn = document.getElementById("exitBtn");
 
 function showWarningModal(){
   backdrop.classList.add("show");
+
+  // Auto resume in 8s
+  let countdown = 8;
+  const modalText = backdrop.querySelector("p");
+  modalText.textContent = `This is your first warning. Resuming exam in ${countdown}s...`;
+
+  const interval = setInterval(async ()=>{
+    countdown--;
+    modalText.textContent = `This is your first warning. Resuming exam in ${countdown}s...`;
+    if(countdown <= 0){
+      clearInterval(interval);
+      backdrop.classList.remove("show");
+      try { await requestFullscreen(); } catch(e){}
+      setTimeout(()=>{ violationLock = false; },150);
+    }
+  },1000);
 }
 
 function hideWarningModal(){
@@ -202,7 +216,7 @@ function finishExam(){
   const cdEl = document.getElementById("countdownBox");
   const interval = setInterval(()=>{
     countdown--;
-    cdEl.textContent = `Record your score. Returning to start in \${countdown}s...`;
+    cdEl.textContent = `Record your score. Returning to start in ${countdown}s...`;
     if(countdown<=0){
       clearInterval(interval);
       resetExam();
@@ -229,8 +243,20 @@ function handleViolation(){
   tabWarnings++;
 
   if(tabWarnings === 1){
-    // First offense: show modal, allow resume + re-fullscreen
+    // First offense: show modal + auto resume after 8s
     showWarningModal();
+    let autoResume = 8;
+    const cd = document.getElementById("modalCountdown");
+    const iv = setInterval(()=>{
+      autoResume--;
+      cd.textContent = `Resuming in ${autoResume}s...`;
+      if(autoResume<=0){
+        clearInterval(iv);
+        hideWarningModal();
+        requestFullscreen().catch(()=>{});
+        setTimeout(()=>{ violationLock = false; },150);
+      }
+    },1000);
   } else {
     // Second offense: end exam
     document.body.style.background = "red";
@@ -245,13 +271,12 @@ document.addEventListener("visibilitychange", () => {
   if(document.hidden){ handleViolation(); }
 });
 
-// If they exit fullscreen during the exam (e.g., press Esc), treat like a violation on first time
+// Exit fullscreen = violation
 document.addEventListener("fullscreenchange", () => {
   if(isExamActive && !inFullscreen()){
     handleViolation();
   }
 });
-// WebKit/MS variants just in case
 document.addEventListener("webkitfullscreenchange", () => {
   if(isExamActive && !inFullscreen()){
     handleViolation();
@@ -267,8 +292,7 @@ document.addEventListener("msfullscreenchange", () => {
 continueBtn.addEventListener("click", async ()=>{
   hideWarningModal();
   try { await requestFullscreen(); } catch(e){}
-  // small delay ensures fullscreen state is updated before unlocking
-  setTimeout(()=>{ violationLock = false; }, 150);
+  setTimeout(()=>{ violationLock = false; },150);
 });
 exitBtn.addEventListener("click", ()=>{
   hideWarningModal();
@@ -283,7 +307,6 @@ startBtn.addEventListener("click", async ()=>{
   resultEl.textContent="Exam in progress...";
   isExamActive = true;
 
-  // Load questions then render
   fetch("exam-data.json")
     .then(res=>res.json())
     .then(data=>{
@@ -299,5 +322,6 @@ startBtn.addEventListener("click", async ()=>{
     });
 });
 </script>
+
 </body>
 </html>
