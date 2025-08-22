@@ -74,7 +74,7 @@
 </div>
 <!-- Confirmation Modal -->
 <div id="confirmBackdrop" class="modal-backdrop">
-  <div class="modal-content">
+  <div class="modal">
     <h2>Confirm Answer</h2>
     <p id="confirmText">Are you sure you want to submit this answer?</p>
     <div class="modal-actions">
@@ -155,19 +155,30 @@ function renderQuestion(index){
   
 function showConfirmModal(answer, onConfirm){
   confirmText.textContent = `Are you sure you want to submit "${answer}" as your final answer?`;
-  document.getElementById("confirmBackdrop").classList.add("show");
+  const backdrop = document.getElementById("confirmBackdrop");
+  backdrop.classList.add("show");
 
   const yesBtn = document.getElementById("confirmYes");
   const noBtn = document.getElementById("confirmNo");
 
-  yesBtn.onclick = ()=>{
-    document.getElementById("confirmBackdrop").classList.remove("show");
+  const handleYes = ()=>{
+    backdrop.classList.remove("show");
     if(typeof onConfirm === "function") onConfirm();
+    document.removeEventListener("keydown", handleEnter);
   };
-  noBtn.onclick = ()=>{
-    document.getElementById("confirmBackdrop").classList.remove("show");
+  const handleNo = ()=>{
+    backdrop.classList.remove("show");
+    document.removeEventListener("keydown", handleEnter);
   };
+  const handleEnter = (e)=>{
+    if(e.key === "Enter"){ e.preventDefault(); handleYes(); }
+  };
+
+  yesBtn.onclick = handleYes;
+  noBtn.onclick = handleNo;
+  document.addEventListener("keydown", handleEnter);
 }
+
 
 
 
@@ -246,17 +257,18 @@ function shuffleArray(arr){
 
 
 
-
 function finishExam(){
   clearInterval(timer);
   isExamActive = false;
   quizDiv.innerHTML="";
   progressEl.textContent="Exam Completed";
+  resultEl.textContent="Exam Finished"; // <-- fix
 
   const html=`<h2>Exam Results</h2>
             <h3 style="color:var(--accent)">Final Score: ${score}/${questions.length}</h3>
             <div id="countdownBox" style="margin-top:12px;font-size:16px;color:var(--muted)">
-              Record your score. Returning to start in 60s...
+              After 60 seconds, you can re-attempt the test. 
+              But your next score will be averaged with this attempt.
             </div>`;
   quizDiv.innerHTML = html;
 
@@ -264,7 +276,8 @@ function finishExam(){
   const cdEl = document.getElementById("countdownBox");
   const interval = setInterval(()=>{
     countdown--;
-    cdEl.textContent = `Record your score. Returning to start in ${countdown}s...`;
+    cdEl.textContent = `After ${countdown}s, you can re-attempt the test. 
+                        The new score will be averaged with this attempt.`;
     if(countdown<=0){
       clearInterval(interval);
       resetExam();
@@ -373,6 +386,7 @@ startBtn.addEventListener("click", async ()=>{
 
 </body>
 </html>
+
 
 
 
