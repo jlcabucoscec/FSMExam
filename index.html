@@ -153,7 +153,7 @@ function renderQuestion(index){
 
 
   
-function showConfirmModal(answer, onConfirm){
+function showConfirmModal(answer, onConfirm) {
   confirmText.textContent = `Are you sure you want to submit "${answer}" as your final answer?`;
   const backdrop = document.getElementById("confirmBackdrop");
   backdrop.classList.add("show");
@@ -161,17 +161,25 @@ function showConfirmModal(answer, onConfirm){
   const yesBtn = document.getElementById("confirmYes");
   const noBtn = document.getElementById("confirmNo");
 
-  const handleYes = ()=>{
+  // Confirm + cleanup
+  const handleYes = () => {
     backdrop.classList.remove("show");
-    if(typeof onConfirm === "function") onConfirm();
+    if (typeof onConfirm === "function") onConfirm();
     document.removeEventListener("keydown", handleEnter);
   };
-  const handleNo = ()=>{
+
+  // Cancel + cleanup
+  const handleNo = () => {
     backdrop.classList.remove("show");
     document.removeEventListener("keydown", handleEnter);
   };
-  const handleEnter = (e)=>{
-    if(e.key === "Enter"){ e.preventDefault(); handleYes(); }
+
+  // Handle Enter inside modal
+  const handleEnter = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleYes();
+    }
   };
 
   yesBtn.onclick = handleYes;
@@ -386,6 +394,7 @@ startBtn.addEventListener("click", async ()=>{
 
 </body>
 </html>
+
 
 
 
