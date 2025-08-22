@@ -73,7 +73,7 @@
   </div>
 </div>
 <!-- Confirmation Modal -->
-<div id="confirmModal" class="modal">
+<div id="confirmBackdrop" class="modal-backdrop">
   <div class="modal-content">
     <h2>Confirm Answer</h2>
     <p id="confirmText">Are you sure you want to submit this answer?</p>
@@ -155,26 +155,20 @@ function renderQuestion(index){
   
 function showConfirmModal(answer, onConfirm){
   confirmText.textContent = `Are you sure you want to submit "${answer}" as your final answer?`;
-  confirmModal.style.display = "flex";
+  document.getElementById("confirmBackdrop").classList.add("show");
 
-  // Remove old listeners by cloning
-  confirmYes.replaceWith(confirmYes.cloneNode(true));
-  confirmNo.replaceWith(confirmNo.cloneNode(true));
+  const yesBtn = document.getElementById("confirmYes");
+  const noBtn = document.getElementById("confirmNo");
 
-  // Re-select the new buttons
-  const newYesBtn = document.getElementById("confirmYes");
-  const newNoBtn = document.getElementById("confirmNo");
-
-  newYesBtn.addEventListener("click", ()=>{
-    confirmModal.style.display="none";
+  yesBtn.onclick = ()=>{
+    document.getElementById("confirmBackdrop").classList.remove("show");
     if(typeof onConfirm === "function") onConfirm();
-  });
-
-  newNoBtn.addEventListener("click", ()=>{
-    confirmModal.style.display="none";
-    // Stay on the same question
-  });
+  };
+  noBtn.onclick = ()=>{
+    document.getElementById("confirmBackdrop").classList.remove("show");
+  };
 }
+
 
 
 
@@ -379,6 +373,7 @@ startBtn.addEventListener("click", async ()=>{
 
 </body>
 </html>
+
 
 
 
