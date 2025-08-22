@@ -147,45 +147,55 @@ function renderQuestion(index){
 
   document.getElementById("submitBtn").addEventListener("click", submit);
   document.getElementById("ansInput").addEventListener("keydown", e=>{
-    if(e.key === "Enter"){ e.preventDefault(); submit(); }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (confirmOpen) return;   // ignore Enter if confirm is open
+      submit();
+    }
   });
+
 }
 
 
-  
 function showConfirmModal(answer, onConfirm) {
   confirmText.textContent = `Are you sure you want to submit "${answer}" as your final answer?`;
   const backdrop = document.getElementById("confirmBackdrop");
   backdrop.classList.add("show");
+  confirmOpen = true;
 
   const yesBtn = document.getElementById("confirmYes");
   const noBtn = document.getElementById("confirmNo");
 
-  // Confirm + cleanup
+  // move focus into the modal so Enter targets it
+  setTimeout(() => yesBtn.focus(), 0);
+
+  const cleanup = () => {
+    document.removeEventListener("keydown", handleKeys, true);
+    confirmOpen = false;
+  };
+
   const handleYes = () => {
     backdrop.classList.remove("show");
+    cleanup();
     if (typeof onConfirm === "function") onConfirm();
-    document.removeEventListener("keydown", handleEnter);
   };
 
-  // Cancel + cleanup
   const handleNo = () => {
     backdrop.classList.remove("show");
-    document.removeEventListener("keydown", handleEnter);
+    cleanup();
   };
 
-  // Handle Enter inside modal
-  const handleEnter = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleYes();
-    }
+  // capture phase = true so the background input doesn’t see Enter/Escape
+  const handleKeys = (e) => {
+    if (e.key === "Enter") { e.preventDefault(); handleYes(); }
+    if (e.key === "Escape") { e.preventDefault(); handleNo(); }
   };
+  document.addEventListener("keydown", handleKeys, true);
 
   yesBtn.onclick = handleYes;
   noBtn.onclick = handleNo;
-  document.addEventListener("keydown", handleEnter);
 }
+
 
 
 
@@ -230,6 +240,7 @@ let remaining = 10*60;
 let tabWarnings = 0;
 let isExamActive = false;
 let violationLock = false; // prevents duplicate triggers while modal open
+let confirmOpen = false;
 
 const quizDiv = document.getElementById("quiz");
 const progressEl = document.getElementById("progress");
@@ -394,6 +405,7 @@ startBtn.addEventListener("click", async ()=>{
 
 </body>
 </html>
+
 
 
 
