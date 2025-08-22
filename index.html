@@ -184,20 +184,25 @@ function renderQuestion(index){
                   <button id="submitBtn">Submit</button>`;
   quizDiv.appendChild(card);
 
-  const submit = () => {
-    const ans = document.getElementById("ansInput").value.trim();
-    userAnswers[index]=ans || "-";
+  function submit(){
+    const ans = document.getElementById("ansInput").value.trim() || "-";
+    // Confirmation
+    if(!confirm(`Are you sure you want to submit "${ans}" as your final answer?`)){
+      return; // cancel move
+    }
+    userAnswers[index]=ans;
     if(ans.toLowerCase() === q.answer.toLowerCase()) score++;
     current++;
     if(current<questions.length){ renderQuestion(current); }
     else { finishExam(); }
-  };
+  }
 
   document.getElementById("submitBtn").addEventListener("click", submit);
   document.getElementById("ansInput").addEventListener("keydown", e=>{
     if(e.key==="Enter"){ e.preventDefault(); submit(); }
   });
 }
+
 
 function finishExam(){
   clearInterval(timer);
@@ -325,3 +330,4 @@ startBtn.addEventListener("click", async ()=>{
 
 </body>
 </html>
+
