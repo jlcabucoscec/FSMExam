@@ -58,6 +58,17 @@
 </main>
 
 <footer>Made for classroom use. Tip: Use it offline by saving this file.</footer>
+<!-- Confirmation Modal -->
+<div id="confirmModal" class="modal">
+  <div class="modal-content">
+    <h2>Confirm Answer</h2>
+    <p id="confirmText">Are you sure you want to submit this answer?</p>
+    <div class="modal-actions">
+      <button id="confirmYes">Yes</button>
+      <button id="confirmNo">No</button>
+    </div>
+  </div>
+</div>
 
 <!-- Modal -->
 <div id="warningBackdrop" class="modal-backdrop" aria-modal="true" role="dialog">
@@ -101,6 +112,78 @@ function inFullscreen(){
             document.mozFullScreenElement || document.msFullscreenElement);
 }
 
+/* ------------------ Confirmation Modal ------------------ */
+const confirmModal = document.getElementById("confirmModal");
+const confirmText = document.getElementById("confirmText");
+const confirmYes = document.getElementById("confirmYes");
+const confirmNo = document.getElementById("confirmNo");
+
+let pendingSubmit = null; // holds the callback for current answer
+
+function showConfirmModal(answer, callback){
+  confirmText.textContent = `Are you sure you want to submit "${answer}" as your final answer?`;
+  confirmModal.style.display = "flex";
+  pendingSubmit = callback;
+}
+
+function hideConfirmModal(){
+  confirmModal.style.display = "none";
+  pendingSubmit = null;
+}
+
+confirmYes.addEventListener("click", ()=>{
+  if(pendingSubmit) pendingSubmit();
+  hideConfirmModal();
+});
+
+confirmNo.addEventListener("click", ()=>{
+  hideConfirmModal();
+});
+
+/* ------------------ Modified renderQuestion ------------------ */
+function renderQuestion(index){
+  quizDiv.innerHTML="";
+  const q = questions[index];
+  progressEl.textContent = `Question ${index+1}/${questions.length}`;
+
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <div class="question">${q.question}</div>
+    <input type="text" class="answer" id="ansInput" autocomplete="off" autofocus>
+    <button id="submitBtn">Submit</button>
+  `;
+  quizDiv.appendChild(card);
+
+  // --- Actual answer processing ---
+  function processAnswer(){
+    const ans = document.getElementById("ansInput").value.trim() || "-";
+    userAnswers[index] = ans;
+    if(ans.toLowerCase() === q.answer.toLowerCase()) score++;
+    current++;
+    if(current < questions.length){ 
+      renderQuestion(current); 
+    } else { 
+      finishExam(); 
+    }
+  }
+
+  // --- Submit with confirmation modal ---
+  function submit(){
+    const ans = document.getElementById("ansInput").value.trim() || "-";
+    showConfirmModal(ans, processAnswer);
+  }
+
+  document.getElementById("submitBtn").addEventListener("click", submit);
+  document.getElementById("ansInput").addEventListener("keydown", e=>{
+    if(e.key === "Enter"){ 
+      e.preventDefault(); 
+      submit(); 
+    }
+  });
+}
+
+  
 /* ------------------ Modal ------------------ */
 const backdrop = document.getElementById("warningBackdrop");
 
@@ -172,47 +255,6 @@ function shuffleArray(arr){
   return arr;
 }
 
-function renderQuestion(index){
-  quizDiv.innerHTML="";
-  const q = questions[index];
-  progressEl.textContent = `Question ${index+1}/${questions.length}`;
-
-  const card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML = `
-    <div class="question">${q.question}</div>
-    <input type="text" class="answer" id="ansInput" autocomplete="off" autofocus>
-    <button id="submitBtn">Submit</button>
-  `;
-  quizDiv.appendChild(card);
-
-  // --- Actual answer processing ---
-  function processAnswer(){
-    const ans = document.getElementById("ansInput").value.trim() || "-";
-    userAnswers[index] = ans;
-    if(ans.toLowerCase() === q.answer.toLowerCase()) score++;
-    current++;
-    if(current < questions.length){ 
-      renderQuestion(current); 
-    } else { 
-      finishExam(); 
-    }
-  }
-
-  // --- Submit with confirmation modal ---
-  function submit(){
-    const ans = document.getElementById("ansInput").value.trim() || "-";
-    showConfirmModal(ans, processAnswer);
-  }
-
-  document.getElementById("submitBtn").addEventListener("click", submit);
-  document.getElementById("ansInput").addEventListener("keydown", e=>{
-    if(e.key === "Enter"){ 
-      e.preventDefault(); 
-      submit(); 
-    }
-  });
-}
 
 
 
@@ -342,4 +384,5 @@ startBtn.addEventListener("click", async ()=>{
 
 </body>
 </html>
+
 
