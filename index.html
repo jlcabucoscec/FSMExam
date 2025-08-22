@@ -113,76 +113,70 @@ function inFullscreen(){
             document.mozFullScreenElement || document.msFullscreenElement);
 }
 
-/* ------------------ Confirmation Modal ------------------ */
-const confirmModal = document.getElementById("confirmModal");
-const confirmText = document.getElementById("confirmText");
-const confirmYes = document.getElementById("confirmYes");
-const confirmNo = document.getElementById("confirmNo");
-
-let pendingSubmit = null; // holds the callback for current answer
-
-function showConfirmModal(answer, callback){
-  confirmText.textContent = `Are you sure you want to submit "${answer}" as your final answer?`;
-  confirmModal.style.display = "flex";
-  pendingSubmit = callback;
-}
-
-function hideConfirmModal(){
-  confirmModal.style.display = "none";
-  pendingSubmit = null;
-}
-
-confirmYes.addEventListener("click", ()=>{
-  if(pendingSubmit) pendingSubmit();
-  hideConfirmModal();
-});
-
-confirmNo.addEventListener("click", ()=>{
-  hideConfirmModal();
-});
-
 /* ------------------ Modified renderQuestion ------------------ */
 function renderQuestion(index){
   quizDiv.innerHTML="";
   const q = questions[index];
-  progressEl.textContent = `Question ${index+1}/${questions.length}`;
+  progressEl.textContent=`Question ${index+1}/${questions.length}`;
 
-  const card = document.createElement("div");
-  card.className = "card";
-  card.innerHTML = `
+  const card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=`
     <div class="question">${q.question}</div>
     <input type="text" class="answer" id="ansInput" autocomplete="off" autofocus>
     <button id="submitBtn">Submit</button>
   `;
   quizDiv.appendChild(card);
 
-  // --- Actual answer processing ---
-  function processAnswer(){
-    const ans = document.getElementById("ansInput").value.trim() || "-";
-    userAnswers[index] = ans;
+  const processAnswer = () => {
+    const ans = document.getElementById("ansInput").value.trim();
+    userAnswers[index] = ans || "-";
     if(ans.toLowerCase() === q.answer.toLowerCase()) score++;
     current++;
-    if(current < questions.length){ 
-      renderQuestion(current); 
-    } else { 
-      finishExam(); 
+    if(current < questions.length){
+      renderQuestion(current);
+    } else {
+      finishExam();
     }
-  }
+  };
 
-  // --- Submit with confirmation modal ---
-  function submit(){
+  const submit = () => {
     const ans = document.getElementById("ansInput").value.trim() || "-";
     showConfirmModal(ans, processAnswer);
-  }
+  };
 
   document.getElementById("submitBtn").addEventListener("click", submit);
   document.getElementById("ansInput").addEventListener("keydown", e=>{
-    if(e.key === "Enter"){ 
-      e.preventDefault(); 
-      submit(); 
-    }
+    if(e.key === "Enter"){ e.preventDefault(); submit(); }
   });
 }
+
+
+  
+function showConfirmModal(answer, onConfirm){
+  confirmText.textContent = `Are you sure you want to submit "${answer}" as your final answer?`;
+  confirmModal.style.display = "flex";
+
+  // Remove old listeners by cloning
+  confirmYes.replaceWith(confirmYes.cloneNode(true));
+  confirmNo.replaceWith(confirmNo.cloneNode(true));
+
+  // Re-select the new buttons
+  const newYesBtn = document.getElementById("confirmYes");
+  const newNoBtn = document.getElementById("confirmNo");
+
+  newYesBtn.addEventListener("click", ()=>{
+    confirmModal.style.display="none";
+    if(typeof onConfirm === "function") onConfirm();
+  });
+
+  newNoBtn.addEventListener("click", ()=>{
+    confirmModal.style.display="none";
+    // Stay on the same question
+  });
+}
+
+
 
   
 /* ------------------ Modal ------------------ */
@@ -385,6 +379,7 @@ startBtn.addEventListener("click", async ()=>{
 
 </body>
 </html>
+
 
 
 
